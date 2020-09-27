@@ -1,0 +1,3 @@
+    step = pi/(points/2)
+    X = np.arange(step, 2*pi+ step, step)
+    Y = np.square (X)
