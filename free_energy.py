@@ -11,11 +11,16 @@ class Data():
         self.points = points
         self.x = torch.unsqueeze(torch.linspace(0.001, 2 * np.pi, self.points), dim=1)  # x data (tensor), shape=(100, 1)
         self.y = torch.square(torch.sin(self.x))  # noisy y data (tensor), shape=(100, 1)
-        self.input1 = torch.sin(self.x)
-        self.input2 = torch.cos(self.y)
+
+    def input_variables(self):
+        self.input_var = torch.zeros((self.points, 2))
+        for i in range (self.points):
+            self.input_var[i][0] = torch.cos(self.x[i])
+            self.input_var[i][1] = torch.sin(self.x[i])
+        return self.input_var
 
     def get(self):
-        return self.input1, self.input2
+        return self.x, self.y
 
     def matrix(self):
         self.matrics = torch.zeros ([self.points, self.points])
@@ -106,7 +111,7 @@ def train(x, y, optimizer, Loss_function, epochs):
     plt.show()
 
 #%%
-def train_free_e (x, rho, lambd, optimizer, epochs, matrix):
+def train_free_e (input_var, rho, lambd, optimizer, epochs, matrix):
     plt.ion()
     Loss_points = []
     fig = plt.figure()
@@ -116,7 +121,7 @@ def train_free_e (x, rho, lambd, optimizer, epochs, matrix):
 
     for i in range(epochs):
 
-        yhat = net(x) 
+        yhat = net(input_var) 
         loss = free_energy(yhat, rho, lambd, matrix)
         Loss_points.append(loss.item())
 
@@ -145,11 +150,9 @@ def train_free_e (x, rho, lambd, optimizer, epochs, matrix):
 # %%
 data_set = Data(128)
 x, y = data_set.get()
+input_var = data_set.input_variables()
 matrix = data_set.matrix()
-print (x.size())
-print (y.size())
-print (matrix.size())
-Layers = [1, 16, 16, 16, 16, 1]
+Layers = [2, 16, 16, 16, 16, 1]
 net = Net(Layers)
 learning_rate = 0.01
 optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
@@ -158,7 +161,7 @@ optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
 rho = 5
 lambd = 2
 # train(x, y, optimizer, "cross", 500)
-train_free_e (x, rho, lambd, optimizer, 10000, matrix)
+train_free_e (input_var, rho, lambd, optimizer, 10000, matrix)
 
 
 #todo, figure out how to improve the accuracy
