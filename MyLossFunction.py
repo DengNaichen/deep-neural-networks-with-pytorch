@@ -26,8 +26,8 @@ def mse_loss(yhat, y):
 def free_energy(yhat, matrix, rho, lambd):
     L = len(yhat)
     first_term = (1/L) * (torch.mm(yhat.T, torch.log(rho * yhat)))
-    second_term = (1/L**2) * torch.mm(torch.mm(yhat.T, matrix), yhat)
-    third_term = lambd * torch.square(torch.mean(yhat) - 1)  ## todo
+    second_term = (rho/L**2) * torch.mm(torch.mm(yhat.T, matrix), yhat)
+    # third_term = lambd * torch.square(torch.mean(yhat) - 1)  ## todo
     Loss = first_term + second_term + third_term
 
     return Loss
