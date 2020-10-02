@@ -1,31 +1,24 @@
-#%%
 import matplotlib.pyplot as plt
 from MyLossFunction import cross_entropy_loss, free_energy
 
-'''
+def fit(x, y, optimizer, net, epochs, diagram = False):
+    if diagram == True:
+        plt.ion()
+        fig = plt.figure()
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+        fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
 
-@Author: Naicheng Deng
-'''
-
-
-def fit(x, y, optimizer, net, epochs):
-    plt.ion()
-    loss_points = []
-    fig = plt.figure()
-    ax1 = fig.add_subplot(2, 1, 1)
-    ax2 = fig.add_subplot(2, 1, 2)
-    fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
-
+    loss_points = []    
     for i in range(epochs):
-
-        yhat = net(x)  # input x and predict based on x
+        yhat = net(x)
         loss = cross_entropy_loss(yhat, y)
         loss_points.append(loss.item())
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        if i % 10 == 0:
+        if i % 10 == 0 and diagram == True: 
             ax1.cla()
             ax2.cla()
             ax1.scatter(x.data.numpy(), y.data.numpy(), marker=".")
@@ -38,18 +31,20 @@ def fit(x, y, optimizer, net, epochs):
             ax2.set_xlabel("epochs")
             ax2.set_ylabel("Loss")
             plt.pause(0.1)
+    if diagram == True:
+        plt.ioff()
+        plt.show()
+    return net
 
-    plt.ioff()
-    plt.show()
 
-
-def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs):
-    plt.ion()
+def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs, diagram= True):
+    if diagram == True:
+        plt.ion()
+        fig = plt.figure()
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+        fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
     loss_points = []
-    fig = plt.figure()
-    ax1 = fig.add_subplot(2, 1, 1)
-    ax2 = fig.add_subplot(2, 1, 2)
-    fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
 
     for i in range(epochs):
         yhat = net(x)
@@ -60,7 +55,7 @@ def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs):
         loss.backward()
         optimizer.step()
 
-        if i % 500 == 0:
+        if i % 500 == 0 and diagram == True:
             ax1.cla()
             ax2.cla()
             ax1.scatter(x.data.numpy(), yhat.data.numpy(), marker=".")
@@ -75,6 +70,10 @@ def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs):
             ax2.set_title("Free Energy with $\\rho =$ {} and $\\lambda = $ {}".format(rho, lambd))
             ax2.plot(range(epochs)[:i], loss_points[:i])
             plt.pause(0.1)
+    if diagram == True:
+        plt.ioff()
+        plt.show()
+    return net
 
-    plt.ioff()
-    plt.show()
+# why we need tensor data: we only want to use the "tensor" data in tensor without gradient data,
+# .data can do this work

@@ -1,5 +1,7 @@
+#%%
 import torch
-
+import numpy as np
+from numpy import sin, pi
 
 '''
 Define my own loss functions
@@ -12,24 +14,27 @@ x: input of NN
 @Author: Naicheng Deng
 '''
 
+
 def cross_entropy_loss(yhat, y):
     L = len(yhat)
-    Loss = - (1 / L) * (torch.mm(y.T, torch.log(yhat))   # todo, 2pi is not needed any more?
+    loss = - (1 / L) * (torch.mm(y.T, torch.log(yhat))  # here we don't need 2pi, but we need to divide 2pi when calculate the integration
                         + torch.mm((1 - y).T, torch.log(1 - yhat)))
-    return Loss
+    return loss
+
 
 def mse_loss(yhat, y):
-    Loss = torch.mean((y - yhat) ** 2)
+    loss = torch.mean((y - yhat) ** 2)
 
-    return Loss
+    return loss
+
 
 def free_energy(yhat, matrix, rho, lambd):
     L = len(yhat)
-    first_term = (1/L) * (torch.mm(yhat.T, torch.log(rho * yhat)))
-    second_term = (rho/L**2) * torch.mm(torch.mm(yhat.T, matrix), yhat)
-    # third_term = lambd * torch.square(torch.mean(yhat) - 1)  ## todo
-    Loss = first_term + second_term + third_term
+    first_term = (2 * pi / L) * (torch.mm(yhat.T, torch.log(rho * yhat)))
+    second_term = ( 2 * pi**2 * rho / L ** 2) * torch.mm(torch.mm(yhat.T, matrix), yhat)  # todo
+    third_term = lambd * torch.square(torch.mean(yhat) - 1)  # todo
+    loss = first_term + second_term + third_term
 
-    return Loss
+    return loss
 
 
