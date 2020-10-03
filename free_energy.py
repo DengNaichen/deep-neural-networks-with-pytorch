@@ -1,20 +1,21 @@
 import torch
 from Net import Net
 from Data import Data
-from Train import train_free_energy
+from Train import train_free_energy, fit
 
 data_set = Data(128)
 x, y = data_set.get()
-matrics = data_set.matrix()
+matrix = data_set.matrix()
 Layers = [1, 16, 16, 16, 16, 1]
 net = Net(Layers)
-learning_rate = 0.01
+learning_rate = 0.001
 optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
+# data_set.plot_data()
+# net = fit(x, y, optimizer, net, 500, diagram=False)  # todo: tell Yousef that cross entropy doesn't work
 
 
-rho = 5.5
-lambd = 6
-train_free_energy(net, x, rho, lambd, optimizer, matrics, epochs=10000, diagram=True)
+rho = 5
+lambd = 2
+train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs=10000, diagram=True)
 
-# todo, figure out how to improve the accuracy
-# todo, which parts of my previous model are wrong?
+

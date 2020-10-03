@@ -13,7 +13,7 @@ net = Net(Layers)
 learning_rate = 0.01
 optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
 # data_set.plot_data()
-net = fit(x, y, optimizer, net, 500, diagram=False)
+net = fit(x, y, optimizer, net, 500, diagram=True)  # todo: tell Yousef that cross entropy doesn't work
 
-print (net(x))
-plt.plot (x, net(x))
+# print (net(x))
+# plt.plot (x, net(x))

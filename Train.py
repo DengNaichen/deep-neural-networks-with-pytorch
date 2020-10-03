@@ -48,7 +48,7 @@ def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs, diagram= Tr
 
     for i in range(epochs):
         yhat = net(x)
-        loss = free_energy(yhat, matrix, rho, lambd)
+        loss = free_energy(yhat, x, matrix, rho, lambd)
         loss_points.append(loss.item())
 
         optimizer.zero_grad()
