@@ -58,7 +58,7 @@ def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs, diagram= Tr
         if i % 500 == 0 and diagram == True:
             ax1.cla()
             ax2.cla()
-            ax1.scatter(x.data.numpy(), yhat.data.numpy(), marker=".")
+            ax1.plot(x.data.numpy(), yhat.data.numpy())
             ax1.set_xlabel("$\\theta$")
             ax2.set_ylabel("$f$")
             ax1.set_title("Distribution Function")

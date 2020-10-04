@@ -15,8 +15,8 @@ class Data():
 
     def __init__(self, points):
         self.points = points
-        self.x = torch.unsqueeze(torch.linspace(0.00001, 2 * np.pi, self.points), dim=1)  # x data (tensor), shape=(100, 1)
-        self.y = torch.square(torch.sin(self.x))  # noisy y data (tensor), shape=(100, 1)
+        self.x = torch.unsqueeze(torch.linspace(0, 2 * np.pi, self.points), dim=1)  # x data (tensor), shape=(100, 1)
+        self.y = torch.square(torch.sin(self.x))
 
     def input_variables(self):
         self.input_var = torch.zeros((self.points, 2))

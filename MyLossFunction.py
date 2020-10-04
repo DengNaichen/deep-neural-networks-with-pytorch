@@ -4,10 +4,10 @@ import numpy as np
 from numpy import sin, pi
 
 '''
-Define my own loss functions
+Define my loss functions
 cross_entropy_loss function 
 mse_loss function
-and the loss function form for free energy
+and the loss function form of free energy
 yhat: the real output of NN
 y: traget output of NN
 x: input of NN
@@ -33,7 +33,9 @@ def free_energy(yhat, x, matrix, rho, lambd):
     first_term = (2 * pi / L) * (torch.mm(yhat.T, torch.log(rho * yhat)))
     second_term = (2 * pi**2 * rho / L ** 2) * torch.mm(torch.mm(yhat.T, matrix), yhat)  # todo
     third_term = lambd * torch.square(torch.trapz(yhat.T, x.T) - 1)  # todo
-    loss = first_term + third_term + second_term
+    loss = first_term \
+         + second_term \
+         + third_term
     
 
     return loss
