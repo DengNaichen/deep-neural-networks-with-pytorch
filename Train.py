@@ -1,7 +1,20 @@
 import matplotlib.pyplot as plt
 from MyLossFunction import cross_entropy_loss, free_energy
+import torch
 
-def fit(x, y, optimizer, net, epochs, diagram = False):
+
+def lr_decay(epoch_num, init_lr, decay_rate):
+    '''
+    :param init_lr: initial learning rate
+    :param decay_rate: if decay rate = 1, no decay
+                       for epoch = 10000, I would use 0.9996 or 0.9997
+    :return: learning rate
+    '''
+    lr_1 = init_lr * decay_rate ** epoch_num
+    return lr_1
+
+
+def fit(x, y, net, epochs, init_lr, decay_rate, diagram=False):
     if diagram == True:
         plt.ion()
         fig = plt.figure()
@@ -11,6 +24,8 @@ def fit(x, y, optimizer, net, epochs, diagram = False):
 
     loss_points = []    
     for i in range(epochs):
+        lr_1 = lr_decay(i, init_lr, decay_rate)
+        optimizer = torch.optim.Adam(net.parameters(), lr=lr_1)
         yhat = net(x)
         loss = cross_entropy_loss(yhat, y)
         loss_points.append(loss.item())
@@ -38,7 +53,7 @@ def fit(x, y, optimizer, net, epochs, diagram = False):
 
 
 def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs, diagram= True):
-    if diagram == True:
+    if diagram:
         plt.ion()
         fig = plt.figure()
         ax1 = fig.add_subplot(2, 1, 1)
@@ -70,9 +85,10 @@ def train_free_energy(net, x, rho, lambd, optimizer, matrix, epochs, diagram= Tr
             ax2.set_title("Free Energy with $\\rho =$ {} and $\\lambda = $ {}".format(rho, lambd))
             ax2.plot(range(epochs)[:i], loss_points[:i])
             plt.pause(0.1)
-    if diagram == True:
+    if diagram:
         plt.ioff()
         plt.show()
+
     return net
 
 # why we need tensor data: we only want to use the "tensor" data in tensor without gradient data,
@@ -89,18 +105,18 @@ def train_free_energy_two_inputs(net, x, inputs, rho, lambd, optimizer, matrix, 
     :param lambd: penalty norm
     :param optimizer:
     :param matrix: |sin(theta - theta')|
-    :param epochs:
-    :param diagram: if plot diagram
+    :param epochs: number of iterations
+    :param diagram: boolean, weather to plot (and save) the diagram
     :return: NN with trained parameters
     '''
 
-    if diagram == True:
-        plt.ion()
-        fig = plt.figure()
-        ax1 = fig.add_subplot(2, 1, 1)
-        ax2 = fig.add_subplot(2, 1, 2)
-        fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
+    plt.ion()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(2, 1, 1)
+    ax2 = fig.add_subplot(2, 1, 2)
+    fig.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.4, wspace=0.25)
     loss_points = []
+
 
     for i in range(epochs):
         yhat = net(inputs)                               # the different from previous one
@@ -111,13 +127,15 @@ def train_free_energy_two_inputs(net, x, inputs, rho, lambd, optimizer, matrix, 
         loss.backward()
         optimizer.step()
 
-        if i % 500 == 0 and diagram == True:
+        if i % 50 == 0:
+            #plot the output
             ax1.cla()
-            ax2.cla()
             ax1.plot(x.data.numpy(), yhat.data.numpy())
             ax1.set_xlabel("$\\theta$")
-            ax2.set_ylabel("$f$")
+            ax1.set_ylabel("$f$")
             ax1.set_title("Distribution Function")
+            #plot the cost
+            ax2.cla()
             ax2.set_xlim([0, epochs])
             ax2.text(epochs / 4, 1.1, 'Loss=%.7f' % loss.data.numpy(), fontdict={'size': 10, 'color': 'black'})
             ax2.text(epochs / 1.5, 1.1, 'epochs=%i' % i, fontdict={'size': 10, 'color': 'blue'})
@@ -125,8 +143,13 @@ def train_free_energy_two_inputs(net, x, inputs, rho, lambd, optimizer, matrix, 
             ax2.set_ylabel("Loss(Free Energy)")
             ax2.set_title("Free Energy with $\\rho =$ {} and $\\lambda = $ {}".format(rho, lambd))
             ax2.plot(range(epochs)[:i], loss_points[:i])
+            # 0.1 second between frames
             plt.pause(0.1)
-    if diagram == True:
+
+    if diagram:
         plt.ioff()
         plt.show()
+        plt.savefig('figure/'+'rho=' + str(rho) + "lambda=" + str(lambd) + '.pdf')
+
+
     return net
