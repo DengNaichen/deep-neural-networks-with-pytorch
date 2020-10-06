@@ -13,9 +13,11 @@ matrix() will return a matrix with dimension [m ,m] for calculating the Loss
 
 class Data():
 
-    def __init__(self, points):
+    def __init__(self, points, lower, upper):
         self.points = points
-        self.x = torch.unsqueeze(torch.linspace(0.000001, 2 * np.pi, self.points), dim=1)
+        self.upper = upper
+        self.lower = lower
+        self.x = torch.unsqueeze(torch.linspace(self.lower, self.upper, self.points), dim=1)
         self.y = torch.square(torch.sin(self.x))
         self.matrics = torch.zeros([self.points, self.points])
         self.input_var = torch.zeros((self.points, 2))

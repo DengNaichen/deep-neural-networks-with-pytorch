@@ -3,8 +3,8 @@ from MyLossFunction import cross_entropy_loss, free_energy
 import torch
 
 
-def fit(x, y, net, epochs, init_lr, decay_rate, diagram=False):
-    if diagram == True:
+def fit(x, y, net, epochs, learning_rate, diagram=False):
+    if diagram:
         plt.ion()
         fig = plt.figure()
         ax1 = fig.add_subplot(2, 1, 1)
@@ -13,8 +13,7 @@ def fit(x, y, net, epochs, init_lr, decay_rate, diagram=False):
 
     loss_points = []
     for i in range(epochs):
-        lr_1 = lr_decay(i, init_lr, decay_rate)
-        optimizer = torch.optim.Adam(net.parameters(), lr=lr_1)
+        optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
         yhat = net(x)
         loss = cross_entropy_loss(yhat, y)
         loss_points.append(loss.item())
@@ -22,7 +21,7 @@ def fit(x, y, net, epochs, init_lr, decay_rate, diagram=False):
         loss.backward()
         optimizer.step()
 
-        if i % 10 == 0 and diagram == True:
+        if i % 10 == 0 and diagram:
             ax1.cla()
             ax2.cla()
             ax1.scatter(x.data.numpy(), y.data.numpy(), marker=".")
@@ -35,7 +34,7 @@ def fit(x, y, net, epochs, init_lr, decay_rate, diagram=False):
             ax2.set_xlabel("epochs")
             ax2.set_ylabel("Loss")
             plt.pause(0.1)
-    if diagram == True:
+    if diagram:
         plt.ioff()
         plt.show()
     return net
@@ -121,8 +120,15 @@ def train_free_energy_two_inputs(net, x, inputs, rho, lambd, scheduler, optimize
             # plot the output
             ax1.cla()
             ax1.plot(x.data.numpy(), yhat.data.numpy())
+            ax1.scatter(x.data.numpy()[0], yhat.data.numpy()[0])
+            ax1.scatter(x.data.numpy()[len(x)-1], yhat.data.numpy()[len(x)-1])
+            ax1.annotate('(%.2f, %.4f)' % (x.data.numpy()[0], yhat.data.numpy()[0]),
+                         (x.data.numpy()[0], yhat.data.numpy()[0]))
+            ax1.annotate('(%.2f, %.4f)' % (x.data.numpy()[len(x)-1], yhat.data.numpy()[len(x)-1]),
+                         (x.data.numpy()[len(x)-1], yhat.data.numpy()[len(x)-1]))
             ax1.set_xlabel("$\\theta$")
             ax1.set_ylabel("$f$")
+            ax1.set_xlim([-1, 7.5])
             ax1.set_title("Distribution Function")
             # plot the cost
             ax2.cla()
