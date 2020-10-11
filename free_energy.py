@@ -12,10 +12,6 @@ net = Net(Layers)
 learning_rate = 0.01
 optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
 
-rho = 5
+rho = 5.9
 lambd = 2
 train_free_energy(net, x, rho, lambd, optimizer, matrics, epochs=5000)
-
-# todo, figure out how to improve the accuracy
-# todo, figure out how Pytorch get the gradient for each parameters?
-# todo, which parts of my previous model are wrong?
