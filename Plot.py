@@ -1,16 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy
 
+
 def plot_set_up():
     plt.ion()
     fig = plt.figure()
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
-    plt.subplots_adjust(left=0.15,bottom=0.1,top=0.9,right=0.95,hspace=0.6,wspace=0.25)
+    plt.subplots_adjust(left=0.15, bottom=0.1, top=0.9, right=0.95, hspace=0.6, wspace=0.25)
     return ax1, ax2
 
+
 def iteration_fit(ax1, ax2, x, y, yhat, epochs, Loss_points, i, loss):
-    if i% 50 == 0:
+    if i % 50 == 0:
         ax1.cla()
         ax2.cla()
         ax1.scatter(x.data.numpy(), y.data.numpy(), marker=".")
