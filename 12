@@ -1,0 +1,35 @@
+        if i % 500 == 0:
+            # plot the output
+            ax1.cla()
+            ax1.plot(x.data.numpy(), yhat_clone.data.numpy())
+            ax1.scatter(x.data.numpy()[0], yhat_clone.data.numpy()[0])
+            ax1.scatter(x.data.numpy()[len(x)-1], yhat_clone.data.numpy()[len(x)-1])
+            ax1.scatter(x.data.numpy()[1], yhat_clone.data.numpy()[1])
+            ax1.scatter(x.data.numpy()[len(x) - 2], yhat_clone.data.numpy()[len(x) - 2])
+            ax1.annotate('(%.2f, %.4f)' % (x.data.numpy()[0], yhat_clone.data.numpy()[0]),
+                         (x.data.numpy()[0], yhat_clone.data.numpy()[0]))
+            ax1.annotate('(%.2f, %.4f)' % (x.data.numpy()[len(x)-1], yhat_clone.data.numpy()[len(x)-1]),
+                         (x.data.numpy()[len(x)-1], yhat_clone.data.numpy()[len(x)-1]))
+            ax1.set_xlabel("$\\theta$")
+            ax1.set_ylabel("$f$")
+            # ax1.set_ylim([0, 0.6])
+            ax1.set_xlim([-1, 7.5])
+            ax1.set_title("Distribution Function")
+            # plot the cost
+            ax2.cla()
+            ax2.set_xlim([0, epochs])
+            ax2.text(epochs / 4, 1.1, 'Loss=%.7f' % loss.data.numpy(), fontdict={'size': 10, 'color': 'black'})
+            ax2.text(epochs / 1.5, 1.1, 'epochs=%i' % i, fontdict={'size': 10, 'color': 'blue'})
+            ax2.set_xlabel("epochs")
+            ax2.set_ylabel("Loss(Free Energy)")
+            ax2.set_title("Free Energy with $\\rho =$ {} and $\\lambda = $ {}".format(rho, lambd))
+            ax2.plot(range(epochs)[:i], loss_points[:i])
+            # 0.1 second between frames
+            plt.pause(0.1)
+
+    if diagram:
+        plt.ioff()
+        plt.show()
+        plt.savefig('figure/' + 'rho=' + str(rho) + "lambda=" + str(lambd) + '.pdf')
+
+    return net
