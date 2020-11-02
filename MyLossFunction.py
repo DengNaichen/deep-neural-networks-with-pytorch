@@ -1,7 +1,6 @@
 # %%
 import torch
 import numpy as np
-from numpy import sin, pi
 
 '''
 Define my loss functions
@@ -17,8 +16,7 @@ x: input of NN
 
 def cross_entropy_loss(yhat, y):
     L = len(yhat)
-    loss = - (1 / L) * (torch.mm(y.T, torch.log(yhat))  # here we don't need 2pi, but we need to divide 2pi when
-                        # calculate the integration
+    loss = - (1 / L) * (torch.mm(y.T, torch.log(yhat))
                         + torch.mm((1 - y).T, torch.log(1 - yhat)))
     return loss
 
@@ -29,13 +27,11 @@ def mse_loss(yhat, y):
     return loss
 
 
-def free_energy(yhat, x, matrix, rho, lambd):
-    L = len(yhat)
-    first_term = torch.trapz((yhat*torch.log(rho*yhat)).T, x.T)  #todo： this should be right
-    second_term = (2 * pi ** 2 * rho / L ** 2) * torch.mm(torch.mm(yhat.T, matrix), yhat)  # todo: this part is wrong
-    third_term = lambd * torch.square(torch.trapz(yhat.T, x.T) - 1)  # the only reason we need x
-    loss = first_term \
-            +second_term\
-           + third_term
-
+def free_energy (yhat, rho, x, simpson_matrix, matrix, lambd):
+    f1 = torch.mm (yhat, yhat.T) * matrix
+    dx = x[1] - x[0]
+    first_term = (dx/3) * torch.mm(simpson_matrix,yhat * torch.log(rho * yhat))
+    second_term = (rho/2) * (dx/3)**2 * torch.mm(torch.mm(simpson_matrix, f1), simpson_matrix.T)
+    third_term = lambd * (((dx/3) *(torch.mm(simpson_matrix,yhat))) - 1 ) **2
+    loss = first_term + second_term + third_term
     return loss
